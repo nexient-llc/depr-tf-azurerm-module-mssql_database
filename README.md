@@ -5,7 +5,10 @@
 
 ## Overview
 
-This terraform module creates a Microsoft SQL Database instance in the Azure Portal.
+This terraform module creates a Microsoft SQL Database instance in the Azure Portal. This module depends on the below mentioned resources which must be existing at the time of the creation of this module
+- Resource group
+- MS SQL Server
+- Storage Account (for extended audit policy)
 
 ## Pre-Commit hooks
 
