@@ -66,16 +66,15 @@ func (suite *TerraTestSuite) TestOutputsWithAzureAPI() {
 
 	actualDatabaseId := terraform.Output(suite.T(), suite.TerraformOptions, "database_id")
 	actualDatabaseName := terraform.Output(suite.T(), suite.TerraformOptions, "database_name")
-	expectedSqlServerName := "demo-eus-dev-000-dbs-002"
+	expectedSqlServerName := "demo-eus-dev-000-dbs-001"
 	expectedSqlDbName := "demo-eus-dev-000-db-002"
 	expectedRgName := "deb-test-devops"
 	// NOTE: "subscriptionID" is overridden by the environment variable "ARM_SUBSCRIPTION_ID". <>
 	subscriptionID := ""
 	database := azure.GetSQLDatabase(suite.T(), expectedRgName, expectedSqlServerName, expectedSqlDbName, subscriptionID)
-	suite.Equal(database.DatabaseID, actualDatabaseId, "The database IDs should match")
-	suite.Equal(database.Name, actualDatabaseName, "The Database Names should match")
+	suite.Equal(*database.ID, actualDatabaseId, "The database IDs should match")
+	suite.Equal(*database.Name, actualDatabaseName, "The Database Names should match")
 	fmt.Println("Database Type: " + *database.Type)
 	fmt.Println("Database Zone Redundant: " + strconv.FormatBool(*database.ZoneRedundant))
-	fmt.Println("Database Create Mode: " + *&database.CreateMode)
 	suite.Equal(actualDatabaseName, expectedSqlDbName, "The database Name tf output should match with input database name")
 }
