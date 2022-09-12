@@ -29,8 +29,11 @@ resource "azurerm_mssql_database" "database" {
   ledger_enabled = var.ledger_enabled
 
   max_size_gb                 = var.max_size_gb
-  restore_point_in_time       = null
-  restore_dropped_database_id = null
+  create_mode                 = var.create_mode
+  restore_point_in_time       = var.restore_point_in_time
+  restore_dropped_database_id = var.restore_dropped_database_id
+  recover_database_id         = var.recover_database_id
+  creation_source_database_id = var.creation_source_database_id
   sku_name                    = var.sku_name
   storage_account_type        = var.storage_account_type
   zone_redundant              = var.zone_redundant
@@ -43,10 +46,10 @@ resource "azurerm_mssql_database" "database" {
   dynamic "long_term_retention_policy" {
     for_each = var.long_term_retention_enabled ? [1] : []
     content {
-      weekly_retention  = lookup(var.long_term_retention_policy, "weekly_retention", "PT0S")
-      monthly_retention = lookup(var.long_term_retention_policy, "monthly_retention", "PT0S")
-      yearly_retention  = lookup(var.long_term_retention_policy, "yearly_retention", "PT0S")
-      week_of_year      = lookup(var.long_term_retention_policy, "week_of_year", 0)
+      weekly_retention  = lookup(var.long_term_retention_policy, "weekly_retention", "P4W")  # 4 weeks
+      monthly_retention = lookup(var.long_term_retention_policy, "monthly_retention", "P2M") # 2 months
+      yearly_retention  = lookup(var.long_term_retention_policy, "yearly_retention", "P2Y")  # 2 years
+      week_of_year      = lookup(var.long_term_retention_policy, "week_of_year", 1)          # 1st week of the year
     }
   }
 

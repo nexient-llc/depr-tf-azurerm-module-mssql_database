@@ -68,13 +68,35 @@ variable "sku_name" {
 }
 
 variable "create_mode" {
-  description = "The create_mode of the database. Possible values are Copy, Default, OnlineSecondary, PointInTimeRestore, Recovery, Restore, RestoreExternalBackup, RestoreExternalBackupSecondary, RestoreLongTermRetentionBackup or Secondary"
+  description = "The create_mode of the database. Possible values are Copy, Default, OnlineSecondary, PointInTimeRestore, Recovery, Restore, RestoreExternalBackup, RestoreExternalBackupSecondary, RestoreLongTermRetentionBackup or Secondary. More details at https://docs.microsoft.com/en-us/rest/api/sql/2021-02-01-preview/databases/create-or-update"
   type        = string
   default     = "Default"
   validation {
     condition     = contains(["Copy", "Default", "OnlineSecondary", "PointInTimeRestore", "Recovery", "Restore", "RestoreExternalBackup", "RestoreExternalBackupSecondary", "RestoreLongTermRetentionBackup", "Secondary"], var.create_mode)
     error_message = "The create_mode must be either 'Copy' or 'Default' or 'OnlineSecondary', 'PointInTimeRestore', 'Recovery', 'Restore', 'RestoreExternalBackup', 'RestoreExternalBackupSecondary', 'RestoreLongTermRetentionBackup' or 'Secondary'."
   }
+}
+
+variable "creation_source_database_id" {
+  description = "Id of the source database from which the copy/restore needs to be performed"
+  default     = null
+}
+
+variable "restore_point_in_time" {
+  description = "The ISO 8601 format point in time for restore. Example: 2022-09-07T15:17:00.00Z"
+  default     = null
+}
+
+variable "restore_dropped_database_id" {
+  description = "The ID of the database to be restored. This property is only applicable when create_mode='Restore'. Copy the id from the output 'restorable_dropped_database_ids' from the server"
+  type        = string
+  default     = null
+}
+
+variable "recover_database_id" {
+  description = "The ID of the database to be recovered. This property is only applicable when the create_mode='Recovery'"
+  type        = string
+  default     = null
 }
 
 variable "zone_redundant" {
@@ -151,17 +173,23 @@ variable "long_term_retention_enabled" {
 variable "long_term_retention_policy" {
   description = "Attributes for long term retention policy. Required only when long_term_retention_enabled = true"
   type = object({
-    weekly_retention  = string #ISO 8601 format - P1Y, P1M, P1W or P7D
-    monthly_retention = string #ISO 8601 format - P1Y, P1M, P1W or P7D
-    yearly_retention  = string #ISO 8601 format - P1Y, P1M, P1W or P7D
-    week_of_year      = number
+    weekly_retention  = string #How long to retain the monthly backup. Example P10W = for 10 weeks
+    monthly_retention = string # How long to retain the monthly backup. Example P3M = for 3 months
+    yearly_retention  = string #How long to retain the monthly backup. Example P5Y = for 5 years
+    week_of_year      = number # Which weekly backup of the year would you like to keep?
   })
   default = {
-    monthly_retention = "PT0S"
-    week_of_year      = 0
-    weekly_retention  = "PT0S"
-    yearly_retention  = "PT0S"
+    monthly_retention = "P1Y" # 1 year
+    week_of_year      = 2     # 2nd weeek of the year backup to be retained
+    weekly_retention  = "P1M" # 1 month
+    yearly_retention  = "P5Y" # 5 years
   }
+}
+
+variable "maintenance_configuration_name" {
+  description = "The name of the public maintenance configuration window to apply to the database"
+  type        = string
+  default     = "SQL_Default"
 }
 
 variable "custom_tags" {
