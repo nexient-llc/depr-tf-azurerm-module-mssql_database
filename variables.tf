@@ -123,25 +123,25 @@ variable "max_size_gb" {
 }
 
 variable "extended_db_auditing_enabled" {
-  description = "Whether the database auditing should be enabled?"
+  description = "Whether the database auditing should be enabled? You may not want to enable this if database server level auditing is enabled"
   type        = bool
   default     = false
 }
 
 variable "retention_in_days" {
-  description = "Number of days to retain the logs in the storage account"
+  description = "Number of days to retain the logs in the storage account. Required if extended_auditing_enabled=true"
   type        = number
   default     = 30
 }
 
 variable "storage_endpoint" {
-  description = "The blob storage endpoint that will hold the extended auditing logs. e.g. https://xxx.blob.core.windows.net"
+  description = "The blob storage endpoint that will hold the extended auditing logs. e.g. https://xxx.blob.core.windows.net. Required if extended_auditing_enabled=true"
   type        = string
   default     = ""
 }
 
 variable "storage_account_access_key" {
-  description = "The access key of the storage account"
+  description = "The access key of the storage account. Required if extended_auditing_enabled=true"
   type        = string
   default     = ""
 }
